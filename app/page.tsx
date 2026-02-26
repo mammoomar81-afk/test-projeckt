@@ -2,9 +2,88 @@
 
 import { useState, useEffect } from "react";
 
+// تعريف الأنواع
+type PlanetAngles = {
+  merkur: number;
+  venus: number;
+  erde: number;
+  mars: number;
+  jupiter: number;
+  saturn: number;
+  uranus: number;
+  neptun: number;
+};
+
+type LanguageText = {
+  de: string;
+  en: string;
+};
+
+type Planet = {
+  name: string;
+  nameDe: string;
+  nameEn: string;
+  distance: number;
+  size: number;
+  color: string;
+  emoji: string;
+  glow: string;
+  hasRing?: boolean;
+  description: LanguageText;
+};
+
+type Phenomenon = {
+  id: number;
+  name: LanguageText;
+  icon: string;
+  category: string;
+  description: LanguageText;
+  facts: {
+    de: string[];
+    en: string[];
+  };
+  animationFrames: string[];
+};
+
+type Rock = {
+  id: number;
+  name: LanguageText;
+  image: string;
+  emoji: string;
+  detailImage: string;
+  description: LanguageText;
+  properties: {
+    hardness: string;
+    color: LanguageText;
+    usage: LanguageText;
+  };
+  locations: LanguageText;
+};
+
+type Mineral = {
+  id: number;
+  name: LanguageText;
+  symbol: string;
+  image: string;
+  emoji: string;
+  detailImage: string;
+  description: LanguageText;
+  properties: {
+    hardness: string;
+    color: LanguageText;
+    usage: LanguageText;
+  };
+  locations: LanguageText;
+};
+
+type Category = {
+  id: string;
+  name: LanguageText;
+};
+
 export default function Home() {
-  const [language, setLanguage] = useState('de');
-  const [angles, setAngles] = useState({
+  const [language, setLanguage] = useState<'de' | 'en'>('de');
+  const [angles, setAngles] = useState<PlanetAngles>({
     merkur: 0,
     venus: 0,
     erde: 0,
@@ -33,7 +112,7 @@ export default function Home() {
   }, []);
 
   // Planetendaten
-  const planets = [
+  const planets: Planet[] = [
     { 
       name: 'Merkur', 
       nameDe: 'MERCUR',
@@ -125,15 +204,15 @@ export default function Home() {
     }
   ];
 
-  // Berechne Positionen
-  const getPlanetPosition = (distance, angle) => {
+  // Berechne Positionen - مع تحديد الأنواع
+  const getPlanetPosition = (distance: number, angle: number): { x: number; y: number } => {
     const x = distance * 1.5 * Math.cos(angle * Math.PI / 180);
     const y = distance * 0.9 * Math.sin(angle * Math.PI / 180);
     return { x, y };
   };
 
-  // Phänomene (ohne permanente Animation)
-  const earthPhenomena = [
+  // Phänomene
+  const earthPhenomena: Phenomenon[] = [
     {
       id: 1,
       name: { de: "Vulkanismus", en: "Volcanoes" },
@@ -155,7 +234,6 @@ export default function Home() {
           "Volcanic eruptions can affect the climate"
         ]
       },
-      // Animationsframes für die Detailansicht
       animationFrames: ["🌋", "🌋🔥", "🌋💥", "🌋🌋", "🌋🔥🔥", "🌋💥💥"]
     },
     {
@@ -299,7 +377,7 @@ export default function Home() {
   ];
 
   // Gesteinsarten
-  const rockTypes = [
+  const rockTypes: Rock[] = [
     { 
       id: 1,
       name: { de: "Granit", en: "Granite" },
@@ -483,7 +561,7 @@ export default function Home() {
   ];
 
   // Mineralien
-  const minerals = [
+  const minerals: Mineral[] = [
     { 
       id: 1,
       name: { de: "Gold", en: "Gold" },
@@ -724,11 +802,11 @@ export default function Home() {
     }
   };
 
-  const [selectedRock, setSelectedRock] = useState(null);
-  const [selectedMineral, setSelectedMineral] = useState(null);
-  const [selectedPhenomenon, setSelectedPhenomenon] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState('alle');
-  const [animationFrame, setAnimationFrame] = useState(0);
+  const [selectedRock, setSelectedRock] = useState<Rock | null>(null);
+  const [selectedMineral, setSelectedMineral] = useState<Mineral | null>(null);
+  const [selectedPhenomenon, setSelectedPhenomenon] = useState<Phenomenon | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('alle');
+  const [animationFrame, setAnimationFrame] = useState<number>(0);
 
   // Animation für ausgewähltes Phänomen
   useEffect(() => {
@@ -743,7 +821,7 @@ export default function Home() {
   const current = content[language];
 
   // Kategorien für Filter
-  const categories = [
+  const categories: Category[] = [
     { id: 'alle', name: { de: 'Alle Phänomene', en: 'All Phenomena' } },
     { id: 'geologisch', name: { de: 'Geologische', en: 'Geological' } },
     { id: 'klimatisch', name: { de: 'Klimatische', en: 'Climatic' } },
@@ -753,7 +831,7 @@ export default function Home() {
   ];
 
   // Gefilterte Phänomene
-  const filteredPhenomena = selectedCategory === 'alle' 
+  const filteredPhenomena: Phenomenon[] = selectedCategory === 'alle' 
     ? earthPhenomena 
     : earthPhenomena.filter(p => p.category === selectedCategory);
 
@@ -801,7 +879,7 @@ export default function Home() {
           <div style={{background: '#111', padding: '30px', borderRadius: '20px', border: '1px solid #fbbf24'}}>
             <h3 style={{color: '#fbbf24', fontSize: '28px', marginBottom: '20px'}}>{current.facts}</h3>
             <ul style={{fontSize: '18px', lineHeight: '2'}}>
-              {selectedPhenomenon.facts[language].map((fact, index) => (
+              {selectedPhenomenon.facts[language].map((fact: string, index: number) => (
                 <li key={index} style={{marginBottom: '10px'}}>• {fact}</li>
               ))}
             </ul>
@@ -942,7 +1020,7 @@ export default function Home() {
       </div>
 
       {/* Umlaufbahnen */}
-      {[120, 170, 220, 270, 340, 410, 480, 550].map((distance, index) => (
+      {[120, 170, 220, 270, 340, 410, 480, 550].map((distance: number, index: number) => (
         <div key={index} style={{
           position: 'fixed',
           top: '50%',
@@ -957,8 +1035,8 @@ export default function Home() {
       ))}
 
       {/* Alle Planeten */}
-      {planets.map((planet, index) => {
-        const angleKey = planet.name.toLowerCase();
+      {planets.map((planet: Planet, index: number) => {
+        const angleKey = planet.name.toLowerCase() as keyof PlanetAngles;
         const pos = getPlanetPosition(planet.distance, angles[angleKey]);
         
         return (
@@ -1118,7 +1196,7 @@ export default function Home() {
           </p>
         </div>
 
-        {/* SEKTION: Naturphänomene (ohne Animation in der Übersicht) */}
+        {/* SEKTION: Naturphänomene */}
         <section style={{marginBottom: '80px'}}>
           <h2 style={{
             fontSize: '42px',
@@ -1140,7 +1218,7 @@ export default function Home() {
             marginBottom: '30px',
             justifyContent: 'center'
           }}>
-            {categories.map(cat => (
+            {categories.map((cat: Category) => (
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
@@ -1166,7 +1244,7 @@ export default function Home() {
             gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
             gap: '25px'
           }}>
-            {filteredPhenomena.map(phenomenon => (
+            {filteredPhenomena.map((phenomenon: Phenomenon) => (
               <div
                 key={phenomenon.id}
                 onClick={() => setSelectedPhenomenon(phenomenon)}
@@ -1203,7 +1281,7 @@ export default function Home() {
                   {phenomenon.name[language]}
                 </h3>
                 <p style={{color: '#fbbf24', fontSize: '14px', marginBottom: '15px', fontStyle: 'italic'}}>
-                  {current.categories[phenomenon.category]}
+                  {current.categories[phenomenon.category as keyof typeof current.categories]}
                 </p>
                 <p style={{color: '#fff', fontSize: '16px', lineHeight: '1.5', marginBottom: '20px'}}>
                   {phenomenon.description[language].substring(0, 100)}...
@@ -1243,7 +1321,7 @@ export default function Home() {
             gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
             gap: '25px'
           }}>
-            {rockTypes.map(rock => (
+            {rockTypes.map((rock: Rock) => (
               <div
                 key={rock.id}
                 onClick={() => setSelectedRock(rock)}
@@ -1316,7 +1394,7 @@ export default function Home() {
             gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
             gap: '25px'
           }}>
-            {minerals.map(mineral => (
+            {minerals.map((mineral: Mineral) => (
               <div
                 key={mineral.id}
                 onClick={() => setSelectedMineral(mineral)}
